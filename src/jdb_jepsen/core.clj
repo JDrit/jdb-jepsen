@@ -1,5 +1,4 @@
 (ns jdb-jepsen.core
-    (:refer-clojure :exclude [swap! reset! get set])
     (:require [clojure.core           :as core]
               [clojure.core.reducers  :as r]
               [clojure.string         :as str]
@@ -17,7 +16,7 @@
 (defn connect
   "Creates a new jdb client for the given server URI. Example:
 
-  (def raft (connect \"http://127.0.0.1:6001\"))
+  (def raft (connect \"http://127.0.0.1:6001\" \"client-id\"))
 
   Options:
   :timeout   How long, in ms, to wait for requests
@@ -27,8 +26,12 @@
   ([server-uri client-id opts]
    (merge {:timeout      default-timeout
            :endpoint     server-uri
-           :client       client-id}
+           :client       client-id
+           :id           (atom 0)}
         opts)))
+
+(defn get-id [client]
+  (reset! (:id client) (inc @(:id client))))
 
 (defn base-url
   "Constructs the base url for all jdb requests. Example:
@@ -117,7 +120,7 @@
   ([client key id opts]
    (->> opts
         (http-opts client)
-        (http/get (url client ["get"]) {:query-params {"client" (:client client) "id" id "key" key}})
+        (http/get (url client ["get"]) {:query-params {"client" (:client client) "id" (get-id client) "key" key}})
         parse)))
 
 (defn put!
@@ -127,7 +130,7 @@
   ([client key value id opts]
    (->> opts
         (http-opts client)
-        (http/get (url client ["put"]) {:query-params {"client" (:client client) "key" key "value" value "id" id }})
+        (http/get (url client ["put"]) {:query-params {"client" (:client client) "key" key "value" value "id" (get-id client) }})
         parse)))
 
 (defn delete!
@@ -137,7 +140,7 @@
   ([client key id opts]
    (->> opts
         (http-opts client)
-        (http/get (url client ["delete"]) {:query-params {"client" (:client client) "id" id "key" key }})
+        (http/get (url client ["delete"]) {:query-params {"client" (:client client) "id" (get-id client) "key" key }})
         parse)))
 
 (defn cas!
@@ -147,7 +150,7 @@
   ([client key currentValue newValue id opts]
    (->> opts
         (http-opts client)
-        (http/get (url client ["cas"]) {:query-params {"client" (:client client) "id" id "key" key "current" currentValue "new" newValue }})
+        (http/get (url client ["cas"]) {:query-params {"client" (:client client) "id" (get-id client) "key" key "current" currentValue "new" newValue }})
         parse)))
 
 (defn append!
@@ -157,7 +160,7 @@
   ([client key value id opts]
    (->> opts
         (http-opts client)
-        (http/get (url client ["append"]) {:query-params {"client" (:client client) "id" id "key" key "value" value }})
+        (http/get (url client ["append"]) {:query-params {"client" (:client client) "id" (get-id client) "key" key "value" value }})
         parse)))
 
 
