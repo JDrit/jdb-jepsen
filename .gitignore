@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /target
 /classes
 /checkouts
@@ -10,6 +11,8 @@ pom.xml.asc
 .hgignore
 .hg/
 
+=======
+>>>>>>> 5535ab5cea5f097a2d5ad80e22948d29328a6193
 pom.xml
 pom.xml.asc
 *jar
