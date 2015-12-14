@@ -115,19 +115,19 @@
 
 (defn get
   "Gets the value for the given key"
-  ([client key id]
-   (get client key id {}))
-  ([client key id opts]
+  ([client key]
+   (get client key {}))
+  ([client key opts]
    (->> opts
         (http-opts client)
-        (http/get (url client ["get"]) {:query-params {"client" (:client client) "id" (get-id client) "key" key}})
+        (http/get (url client ["get"]) {:query-params {"client" (:client client) "id" (get-id client) "key" key }})
         parse)))
 
 (defn put!
   "Puts a new value for the given key"
-  ([client key value id]
-   (put! client key value id {}))
-  ([client key value id opts]
+  ([client key value]
+   (put! client key value {}))
+  ([client key value opts]
    (->> opts
         (http-opts client)
         (http/get (url client ["put"]) {:query-params {"client" (:client client) "key" key "value" value "id" (get-id client) }})
@@ -135,9 +135,9 @@
 
 (defn delete!
   "Deletes the given key from the raft cluster"
-  ([client key id]
-   (delete! client key id {}))
-  ([client key id opts]
+  ([client key]
+   (delete! client key {}))
+  ([client key opts]
    (->> opts
         (http-opts client)
         (http/get (url client ["delete"]) {:query-params {"client" (:client client) "id" (get-id client) "key" key }})
@@ -145,9 +145,9 @@
 
 (defn cas!
   "CAS operation that is sent to the server"
-  ([client key currentValue newValue id]
-   (cas! client key currentValue newValue id {}))
-  ([client key currentValue newValue id opts]
+  ([client key currentValue newValue]
+   (cas! client key currentValue newValue {}))
+  ([client key currentValue newValue opts]
    (->> opts
         (http-opts client)
         (http/get (url client ["cas"]) {:query-params {"client" (:client client) "id" (get-id client) "key" key "current" currentValue "new" newValue }})
@@ -155,9 +155,9 @@
 
 (defn append!
   "Sends an append request to the server"
-  ([client key value id]
-   (append! client key value id {}))
-  ([client key value id opts]
+  ([client key value ]
+   (append! client key value {}))
+  ([client key value opts]
    (->> opts
         (http-opts client)
         (http/get (url client ["append"]) {:query-params {"client" (:client client) "id" (get-id client) "key" key "value" value }})
