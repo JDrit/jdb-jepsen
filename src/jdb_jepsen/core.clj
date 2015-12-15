@@ -151,15 +151,23 @@
         (http/get (url client ["delete"]) {:query-params {"client" (:client client) "id" (get-id client) "key" key }})
         parse)))
 
-(defn cas!
+(defn cas*
   "CAS operation that is sent to the server"
   ([client key currentValue newValue]
-   (cas! client key currentValue newValue {}))
+   (cas* client key currentValue newValue {}))
   ([client key currentValue newValue opts]
    (->> opts
         (http-opts client)
         (http/get (url client ["cas"]) {:query-params {"client" (:client client) "id" (get-id client) "key" key "current" currentValue "new" newValue }})
-        parse)))
+        :body)))
+
+(defn cas!
+  ([client key currentValue newValue]
+   (cas! client key currentValue newValue {}))
+  ([client key currentValue newValue opts]
+   (-> (cas* client key currentValue newValue opts)
+       (json/parse-string true)
+       :replaced)))
 
 (defn append!
   "Sends an append request to the server"
