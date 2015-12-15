@@ -131,15 +131,23 @@
        (json/parse-string true)
        :value)))
 
-(defn put!
+(defn put*
   "Puts a new value for the given key"
   ([client key value]
-   (put! client key value {}))
+   (put* client key value {}))
   ([client key value opts]
    (->> opts
         (http-opts client)
         (http/get (url client ["put"]) {:query-params {"client" (:client client) "key" key "value" value "id" (get-id client) }})
-        parse)))
+        :body)))
+
+(defn put!
+  ([client key value]
+   (put! client key value {}))
+  ([client key value opts]
+   (-> (put* client key value opts)
+       (json/parse-string true)
+       :overridden)))
 
 (defn delete!
   "Deletes the given key from the raft cluster"
