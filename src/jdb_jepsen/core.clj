@@ -113,15 +113,23 @@
    :conn-timeout          (or (:timeout opts) (:timeout client))
    :query-params          (dissoc opts :timeout :root-key)})
 
-(defn get
+(defn get*
   "Gets the value for the given key"
   ([client key]
-   (get client key {}))
+   (get* client key {}))
   ([client key opts]
    (->> opts
         (http-opts client)
         (http/get (url client ["get"]) {:query-params {"client" (:client client) "id" (get-id client) "key" key }})
-        parse)))
+        :body)))
+
+(defn get
+  ([client key]
+   (get client key {}))
+ ([client key opts] 
+   (-> (get* client key opts)
+       (json/parse-string true)
+       :value)))
 
 (defn put!
   "Puts a new value for the given key"
